@@ -8,23 +8,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Web\WebController;
 use App\Http\Controllers\Web\WebAuthController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Http;
 
-Route::get('/test-kafka', function() {
-    $response = Http::withHeaders([
-        'Content-Type' => 'application/vnd.kafka.json.v2+json',
-        'Accept' => 'application/vnd.kafka.v2+json',
-    ])->post('http://localhost:8082/topics/user-login', [
-        "records" => [
-            ["value" => ["message" => "Test from Laravel at " . now()]]
-        ]
-    ]);
-
-    Log::info('Kafka Response: ', $response->json());
-
-    return $response->json();
-});
 /*
 |--------------------------------------------------------------------------
 | Web Routes

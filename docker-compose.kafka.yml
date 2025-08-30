@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
@@ -65,6 +63,8 @@ services:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
+    environment:
+      - TZ=Asia/Ho_Chi_Minh   
     networks:
       - kafka-net
 
@@ -78,27 +78,6 @@ services:
       ME_CONFIG_BASICAUTH_USERNAME: admin
       ME_CONFIG_BASICAUTH_PASSWORD: admin
     depends_on:
-      - mongodb
-    networks:
-      - kafka-net
-
-  laravel-app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: laravel-app
-    ports:
-      - "8000:8000"
-    volumes:
-      - .:/var/www
-    environment:
-      - DB_CONNECTION=mongodb
-      - MONGO_DB_HOST=mongodb
-      - MONGO_DB_PORT=27017
-      - MONGO_DB_DATABASE=weblog
-    depends_on:
-      - kafka
-      - zookeeper
       - mongodb
     networks:
       - kafka-net
