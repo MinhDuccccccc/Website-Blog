@@ -75,21 +75,27 @@ class PostController extends Controller
 ]);
 
 // Gửi thông tin bài viết lên Kafka
-try {
-  Http::post('http://localhost:8082/topics/post-created', [
-    "records" => [
-      ["value" => json_encode([
-        'post_id' => $post->id,
-        'title' => $post->title,
-        'description' => $post->description,
-        'slug' => $post->slug,
-        'created_at' => now()->toDateTimeString()
-      ])]
-    ]
-  ]);
-} catch (\Exception $e) {
-  Log::error('Kafka error when sending post: ' . $e->getMessage());
-}
+    try {
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/vnd.kafka.json.v2+json',
+                'Accept'       => 'application/vnd.kafka.v2+json',
+            ])->post('http://localhost:8082/topics/post-created', [
+                "records" => [
+                    ["value" => [
+                        'post_id'     => $post->id,
+                        'title'       => $post->title,
+                        'description' => $post->description,
+                        'slug'        => $post->slug,
+                        'created_at'  => now()->toDateTimeString(),
+                    ]]
+                ]
+            ]);
+
+            Log::info('Kafka REST status: ' . $response->status());
+            Log::info('Kafka REST response: ' . $response->body());
+        } catch (\Exception $e) {
+            Log::error('Kafka error when sending post: ' . $e->getMessage());
+        }
 
     return redirect()->route('admin.post.index')->with('success', 'Created successfully');
   }
