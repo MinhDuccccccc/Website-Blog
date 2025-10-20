@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 
 class PostController extends Controller
@@ -67,7 +68,7 @@ class PostController extends Controller
   'content' => $request->content,
   'image' => $image,
   'view_counts' => 0,
-  'user_id' => 4,  // Auth::id()
+  'user_id' => Auth::id(),  // Auth::id()
   'new_post' => $request->new_post ? 1 : 0,
   'slug' => $slug,
   'category_id' => $request->category_id,

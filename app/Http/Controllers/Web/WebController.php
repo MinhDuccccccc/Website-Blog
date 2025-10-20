@@ -9,8 +9,8 @@ use Illuminate\Support\Facades\Auth; //Auth là một Facade của Laravel, đ�
 use App\Models\Comment;
 use App\Models\Contact;
 use App\Models\Post;
-
-
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
 class WebController extends Controller
 {
     public function home()
@@ -37,15 +37,46 @@ class WebController extends Controller
        return view('web.post', compact('post', 'relate', 'highlight'));
     }
 
-    public function comment(Request $request, $id)
-    {
-        Comment::create([
-            'content'=>$request->get('content'),
-            'user_id'=>Auth::id(),
-            'post_id'=>$id  
+public function comment(Request $request, $id)
+{
+    // Giữ nguyên logic cũ: lưu comment vào MySQL
+    $comment = Comment::create([
+        'content' => $request->get('content'),
+        'user_id' => Auth::id(),
+        'post_id' => $id
+    ]);
+
+    // Chuẩn bị payload gửi sang Kafka
+    $payload = [
+        'comment_id' => $comment->id,
+        'post_id'    => $comment->post_id,
+        'user_id'    => $comment->user_id,
+        'user_name'  => Auth::user()->name ?? 'Anonymous',
+        'content'    => $comment->content,
+        'created_at' => now()->toDateTimeString()
+    ];
+
+    // Gửi dữ liệu comment sang Kafka topic "comment-created"
+    try {
+        $response = Http::withHeaders([
+            'Content-Type' => 'application/vnd.kafka.json.v2+json',
+            'Accept' => 'application/vnd.kafka.v2+json',
+        ])->post('http://localhost:8082/topics/comment-created', [
+            "records" => [
+                ["value" => $payload]
+            ]
         ]);
-        return redirect()->back();
+
+        Log::info('Comment sent to Kafka successfully', [
+            'status' => $response->status(),
+            'payload' => $payload
+        ]);
+    } catch (\Exception $e) {
+        Log::error('Kafka error when sending comment: ' . $e->getMessage());
     }
+
+    return redirect()->back();
+}
 
     public function category()
     {
@@ -78,9 +109,36 @@ class WebController extends Controller
         ]);
 
         // Bước 2: Tạo contact nếu hợp lệ
-        Contact::create($validated);
+          $contact = Contact::create($validated);
 
-        // Bước 3: Chuyển hướng kèm thông báo thành công
+        // Bước 3: Chuẩn bị payload gửi sang Kafka
+           $payload = [
+        'contact_id' => $contact->id,
+        'name'       => $contact->name,
+        'address'    => $contact->address,
+        'phone'      => $contact->phone,
+        'subject'    => $contact->subject,
+        'message'    => $contact->message,
+        'created_at' => now()->toDateTimeString(),
+    ];
+        // Bước 4: Gửi dữ liệu sang Kafka topic "contact-created"
+            try {
+        $response = Http::withHeaders([
+            'Content-Type' => 'application/vnd.kafka.json.v2+json',
+            'Accept' => 'application/vnd.kafka.v2+json',
+        ])->post('http://localhost:8082/topics/contact-created', [
+            'records' => [
+                ['value' => $payload]
+            ]
+        ]);
+
+        Log::info('Contact sent to Kafka successfully', [
+            'status' => $response->status(),
+            'payload' => $payload
+        ]);
+    } catch (\Exception $e) {
+        Log::error('Kafka error when sending contact: ' . $e->getMessage());
+    }
         return redirect()->route('web.contact')->with('success', 'Created contact successfully');
     }
 }
