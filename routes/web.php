@@ -141,3 +141,7 @@ Route::post('login', [WebAuthController::class, 'login'])
 ->name('web.auth.login');
 Route::get('logout', [WebAuthController::class,'logout'])
 ->name('web.auth.logout');
+Route::get('register', [WebAuthController::class, 'formRegister'])
+->name('web.auth.register.form');
+Route::post('register', [WebAuthController::class, 'register'])
+->name('web.auth.register');
