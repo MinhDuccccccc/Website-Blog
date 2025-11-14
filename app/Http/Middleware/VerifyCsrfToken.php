@@ -19,6 +19,7 @@ class VerifyCsrfToken extends Middleware
     'admin/user/update/*', // ➜ Thêm vào để test PUT update user
      'post/comment/*',
      'admin/user/store',
+     'search',
     // thêm route khác nếu cần test POST
 ];
 }

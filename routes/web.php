@@ -132,16 +132,24 @@ Route::get('post/{slug}', [WebController::class, 'post'])
   
 Route::get('contact', [WebController::class, 'contact'])
 ->name('web.contact');
+
 Route::post('contact', [WebController::class, 'sendContact'])
 ->name('web.contact.store');
 
+Route::get('search', [WebController::class, 'search'])
+->name('web.search');
+
 
 Route::get('login', [WebAuthController::class, 'formLogin']);
+
 Route::post('login', [WebAuthController::class, 'login'])
 ->name('web.auth.login');
+
 Route::get('logout', [WebAuthController::class,'logout'])
 ->name('web.auth.logout');
+
 Route::get('register', [WebAuthController::class, 'formRegister'])
 ->name('web.auth.register.form');
+
 Route::post('register', [WebAuthController::class, 'register'])
 ->name('web.auth.register');

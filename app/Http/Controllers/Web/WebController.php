@@ -141,4 +141,24 @@ public function comment(Request $request, $id)
     }
         return redirect()->route('web.contact')->with('success', 'Created contact successfully');
     }
+
+    public function search(Request $request)
+{
+    $keyword = $request->get('keyword');
+
+    if (!$keyword) {
+        return redirect()->route('web.home');
+    }
+
+    $posts = Post::where('title', 'LIKE', "%{$keyword}%")
+        ->orWhere('description', 'LIKE', "%{$keyword}%")
+        ->orWhere('content', 'LIKE', "%{$keyword}%")
+        ->paginate(5)
+        ->appends(['keyword' => $keyword]); //giữ keyword khi chuyển trang
+
+    $categories = Category::all();
+
+    return view('web.search', compact('posts', 'categories', 'keyword'));
+}
+
 }
