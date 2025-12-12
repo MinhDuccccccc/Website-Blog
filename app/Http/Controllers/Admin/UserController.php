@@ -9,10 +9,10 @@ use Illuminate\Http\Validate;
 class UserController extends Controller
 {
     public function index()
-    {
-       $users = User::all();
-       return view('admin.user.list', compact('users'));
-    }
+{
+    $users = User::paginate(10);
+    return view('admin.user.list', compact('users'));
+}
 
     public function create()
     {

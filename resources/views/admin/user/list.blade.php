@@ -20,7 +20,7 @@
                 </div>
             @endif
 
-            <table class="table table-striped table-bordered table-hover" id="dataTables-example">
+            <table class="table table-striped table-bordered table-hover">
                 <thead>
                     <tr align="center">
                         <th>ID</th>
@@ -53,6 +53,14 @@
                     @endforeach
                 </tbody>
             </table>
+
+            {{-- Pagination nằm bên phải --}}
+            <div class="row">
+    <div class="col-lg-12 text-right">
+        {{ $users->links('pagination::bootstrap-4') }}
+    </div>
+</div>
+
 
         </div>
     </div>
