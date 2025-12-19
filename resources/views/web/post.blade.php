@@ -1,19 +1,156 @@
 @extends('web.layout.master')
 
 @section('content')
+
+<style>
+/* ===== POST DETAIL ===== */
+.single-wrapper {
+    margin-top: 90px;
+}
+
+/* Header */
+.blog-title-area {
+    margin-bottom: 30px;
+}
+
+.blog-title-area h3 {
+    font-size: 32px;
+    font-weight: 700;
+    margin: 16px 0;
+    line-height: 1.4;
+}
+
+.blog-meta.big-meta small {
+    margin-right: 16px;
+    color: #64748b;
+}
+
+/* Image */
+.single-post-media img {
+    border-radius: 18px;
+    margin: 30px 0;
+}
+
+/* Content */
+.blog-content {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 42px 48px;
+    box-shadow: 0 12px 35px rgba(0,0,0,.08);
+}
+
+.blog-content p {
+    font-size: 16px;
+    line-height: 1.9;
+    color: #334155;
+    margin-bottom: 22px;
+}
+
+/* Related posts */
+.custombox {
+    margin-top: 60px;
+}
+
+.custombox .small-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 30px;
+}
+
+/* Related card */
+.custombox .blog-box {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,.08);
+    transition: .3s;
+}
+
+.custombox .blog-box:hover {
+    transform: translateY(-4px);
+}
+
+.custombox .blog-meta {
+    padding: 20px;
+}
+
+/* Comments */
+.comments-list .media {
+    background: #f8fafc;
+    border-radius: 14px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+}
+
+.comments-list h4 {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.comments-list p {
+    margin-top: 10px;
+    color: #475569;
+}
+
+/* Comment form */
+.form-wrapper textarea {
+    min-height: 120px;
+    border-radius: 14px;
+    padding: 16px;
+}
+
+.form-wrapper button {
+    padding: 10px 26px;
+    border-radius: 999px;
+}
+
+/* Sidebar */
+.sidebar .widget {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.08);
+}
+
+.widget-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 25px;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .blog-title-area h3 {
+        font-size: 24px;
+    }
+
+    .blog-content {
+        padding: 26px;
+    }
+}
+</style>
+
 <section class="section single-wrapper">
     <div class="container">
         <div class="row">
-            <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
+
+            {{-- MAIN --}}
+            <div class="col-lg-9">
+
                 <div class="page-wrapper">
+
+                    {{-- TITLE --}}
                     <div class="blog-title-area text-center">
-                        <ol class="breadcrumb hidden-xs-down">
+                        <ol class="breadcrumb hidden-xs-down justify-content-center">
                             <li class="breadcrumb-item"><a href="/">Home</a></li>
                             <li class="breadcrumb-item"><a href="/category">Blog</a></li>
-                            <li class="breadcrumb-item active">{{$post ->title}}</li>
+                            <li class="breadcrumb-item active">{{ $post->title }}</li>
                         </ol>
 
-                        <span class="color-orange"><a href="{{ route('web.category', $post->category->slug) }}" title="">{{ $post->category->name }}</a></span>
+                        <span class="color-orange">
+                            <a href="{{ route('web.category', $post->category->slug) }}">
+                                {{ $post->category->name }}
+                            </a>
+                        </span>
 
                         <h3>{{ $post->title }}</h3>
 
@@ -21,85 +158,83 @@
                             <small>{{ \Carbon\Carbon::parse($post->created_at)->format('d-m-Y') }}</small>
                             <small>{{ $post->user->name }}</small>
                             <small><i class="fa fa-eye"></i> {{ $post->view_counts }}</small>
-                        </div><!-- end meta -->
-                    </div><!-- end title -->
+                        </div>
+                    </div>
 
+                    {{-- IMAGE --}}
                     <div class="single-post-media">
                         <img src="{{ $post->imageUrl() }}" alt="" class="img-fluid">
-                    </div><!-- end media -->
+                    </div>
 
+                    {{-- CONTENT --}}
                     <div class="blog-content">
-                        <div class="pp">
-                            <p>{{ $post->description }}</p>
+                        <p><strong>{{ $post->description }}</strong></p>
+                        {!! $post->content !!}
+                    </div>
 
-                            <p>{!! $post->content !!}</p>
-
-                        </div><!-- end pp -->
-                    </div><!-- end content -->
-
-
-                    <hr class="invis1">
-
+                    {{-- RELATED --}}
                     <div class="custombox clearfix">
                         <h4 class="small-title">You may also like</h4>
                         <div class="row">
                             @foreach($relate as $item)
-                            <div class="col-lg-6">
-                                <div class="blog-box">
-                                    <div class="post-media">
-                                        <a href="{{ route('web.post', $item->slug) }}" title="">
-                                            <img src="{{ $item->imageUrl() }}" alt="" class="img-fluid">
-                                            <div class="hovereffect">
-                                                <span class=""></span>
-                                            </div><!-- end hover -->
-                                        </a>
-                                    </div><!-- end media -->
-                                    <div class="blog-meta">
-                                        <h4><a href="{{ route('web.post', $item->slug) }}" title="">{{ $item->title }}</a></h4>
-                                        <small>{{ \Carbon\Carbon::parse($item->created_at)->format('d-m-Y') }}</small>
-                                        <small>{{ $item->user->name }}</small>
-                                        <small><i class="fa fa-eye"></i> {{ $item->view_counts }}</small>
-                                    </div><!-- end meta -->
-                                </div><!-- end blog-box -->
-                            </div><!-- end col -->
+                                <div class="col-lg-6 mb-4">
+                                    <div class="blog-box">
+                                        <div class="post-media">
+                                            <a href="{{ route('web.post', $item->slug) }}">
+                                                <img src="{{ $item->imageUrl() }}" class="img-fluid">
+                                            </a>
+                                        </div>
+                                        <div class="blog-meta">
+                                            <h4>
+                                                <a href="{{ route('web.post', $item->slug) }}">
+                                                    {{ $item->title }}
+                                                </a>
+                                            </h4>
+                                            <small>{{ \Carbon\Carbon::parse($item->created_at)->format('d-m-Y') }}</small>
+                                            <small>{{ $item->user->name }}</small>
+                                        </div>
+                                    </div>
+                                </div>
                             @endforeach
-                        </div><!-- end row -->
-                    </div><!-- end custom-box -->
+                        </div>
+                    </div>
 
-                    <hr class="invis1">
-
+                    {{-- COMMENTS --}}
                     <div class="custombox clearfix">
                         <h4 class="small-title">{{ $post->comments()->count() }} Comments</h4>
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <div class="comments-list">
-                                    @foreach($post->comments as $comment)
-                                        <div class="media">
-                                            <div class="media-body">
-                                                <h4 class="media-heading user_name">{{ $comment->user->name }} <small>{{ \Carbon\Carbon::parse($comment->created_at)->format('d-m-Y')  }}</small></h4>
-                                                <p>{{ $comment->content }}</p>
-                                            </div>
-                                        </div>
-                                    @endforeach
+                        <div class="comments-list">
+                            @foreach($post->comments as $comment)
+                                <div class="media">
+                                    <div class="media-body">
+                                        <h4>
+                                            {{ $comment->user->name }}
+                                            <small> · {{ \Carbon\Carbon::parse($comment->created_at)->format('d-m-Y') }}</small>
+                                        </h4>
+                                        <p>{{ $comment->content }}</p>
+                                    </div>
                                 </div>
-                            </div><!-- end col -->
-                        </div><!-- end row -->
-                    </div><!-- end custom-box -->
+                            @endforeach
+                        </div>
+                    </div>
 
-                    <hr class="invis1">
-
-                    @if(\Illuminate\Support\Facades\Auth::check())
+                    {{-- COMMENT FORM --}}
+                    @auth
                         <div class="custombox clearfix">
                             <h4 class="small-title">Leave a Reply</h4>
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <form class="form-wrapper" method="post" action="{{ route('web.post.comment', $post->id) }}">
-                                        @csrf
-                                        <textarea class="form-control" id="comment-content" name="content" placeholder="Your comment"></textarea>
-                                        <button type="submit" class="btn btn-primary mt-2" id="submit-comment" disabled>Submit Comment</button>
-                                    </form>
-                                </div>
-                            </div>
+                            <form class="form-wrapper" method="post"
+                                  action="{{ route('web.post.comment', $post->id) }}">
+                                @csrf
+                                <textarea class="form-control"
+                                          id="comment-content"
+                                          name="content"
+                                          placeholder="Write your comment..."></textarea>
+                                <button type="submit"
+                                        class="btn btn-primary mt-3"
+                                        id="submit-comment"
+                                        disabled>
+                                    Submit Comment
+                                </button>
+                            </form>
                         </div>
 
                         <script>
@@ -112,40 +247,38 @@
                                 });
                             });
                         </script>
-                    @endif
+                    @endauth
 
-                </div><!-- end page-wrapper -->
-            </div><!-- end col -->
+                </div>
+            </div>
 
-
-            <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12">
+            {{-- SIDEBAR --}}
+            <div class="col-lg-3">
                 <div class="sidebar">
-
                     <div class="widget">
                         <h2 class="widget-title">Popular Posts</h2>
-                        <div class="trend-videos">
-                            @foreach($highlight as $item)
-                                <div class="blog-box">
-                                    <div class="post-media">
-                                        <a href="{{ route('web.post', $item->slug) }}" title="">
-                                            <img src="{{ $item->imageUrl() }}" alt="" class="img-fluid">
-                                            <div class="hovereffect">
-                                                <span class="videohover"></span>
-                                            </div><!-- end hover -->
+                        @foreach($highlight as $item)
+                            <div class="blog-box mb-4">
+                                <div class="post-media">
+                                    <a href="{{ route('web.post', $item->slug) }}">
+                                        <img src="{{ $item->imageUrl() }}" class="img-fluid">
+                                    </a>
+                                </div>
+                                <div class="blog-meta">
+                                    <h4>
+                                        <a href="{{ route('web.post', $item->slug) }}">
+                                            {{ $item->title }}
                                         </a>
-                                    </div><!-- end media -->
-                                    <div class="blog-meta">
-                                        <h4><a href="{{ route('web.post', $item->slug) }}" title="">{{ $item->title }}</a></h4>
-                                    </div><!-- end meta -->
-                                </div><!-- end blog-box -->
+                                    </h4>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
 
-                                <hr class="invis">
-                            @endforeach
-                        </div><!-- end videos -->
-                    </div><!-- end widget -->
-                </div><!-- end sidebar -->
-            </div><!-- end col -->
-        </div><!-- end row -->
-    </div><!-- end container -->
+        </div>
+    </div>
 </section>
+
 @endsection
