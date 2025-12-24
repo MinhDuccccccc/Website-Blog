@@ -21,7 +21,7 @@ class WebController extends Controller
 
     $new = Post::where('new_post', 1)
         ->orderBy('created_at', 'desc')
-        ->paginate(5); // số bài / trang (bạn có thể đổi 5 → 6 / 10)
+        ->paginate(10); 
 
     return view('web.home', compact('highlight', 'new'));
 }
