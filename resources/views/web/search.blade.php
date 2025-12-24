@@ -7,87 +7,91 @@
 .search-title {
     font-size: 22px;
     font-weight: 600;
-    margin-bottom: 30px;
+    margin-bottom: 36px;
 }
 
 .search-title span {
-    color: #38bdf8;
+    color: #0ea5e9;
 }
 
-/* Card */
-.search-card {
-    background: #ffffff;
-    border-radius: 18px;
-    overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0,0,0,.08);
-    margin-bottom: 32px;
-    transition: .3s;
+/* ===== SEARCH ITEM ===== */
+.search-item {
+    display: flex;
+    gap: 24px;
+    padding: 28px;
+    background: #fff;
+    border-radius: 16px;
+    margin-bottom: 28px;
+    box-shadow: 0 6px 24px rgba(0,0,0,.06);
+    transition: .25s;
 }
 
-.search-card:hover {
-    transform: translateY(-4px);
+.search-item:hover {
+    transform: translateY(-3px);
 }
 
 /* Image */
+.search-thumb {
+    width: 240px;
+    flex-shrink: 0;
+}
+
 .search-thumb img {
     width: 100%;
-    height: 100%;
+    height: 160px;
     object-fit: cover;
+    border-radius: 12px;
 }
 
-/*  FIX MẠNH: padding + spacing */
-.search-meta {
-    padding: 40px 42px;   /* tăng mạnh */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+/* Content */
+.search-content {
+    flex: 1;
+    padding-right: 10px;
 }
 
-.search-meta h4 {
-    margin-bottom: 14px;
+.search-content h4 {
+    margin-bottom: 12px;
 }
 
-.search-meta h4 a {
+.search-content h4 a {
     color: #020617;
     font-weight: 600;
-    line-height: 1.5;
+    line-height: 1.45;
 }
 
-.search-meta p {
+.search-content p {
     color: #475569;
-    margin: 16px 0 20px;
     line-height: 1.7;
-    max-width: 95%;
+    margin-bottom: 16px;
 }
 
-/* Category badge */
-.bg-orange {
-    background: #38bdf8;
-    color: #020617 !important;
-    padding: 6px 16px;
+/* Meta */
+.search-meta small {
+    color: #64748b;
+    margin-right: 14px;
+}
+
+.search-meta .category {
+    background: #e0f2fe;
+    color: #0369a1 !important;
+    padding: 5px 14px;
     border-radius: 999px;
     font-size: 12px;
     font-weight: 600;
 }
 
-/* Meta info */
-.search-meta small {
-    margin-right: 16px;
-    color: #64748b;
-}
-
 /* Sidebar */
 .sidebar .widget {
-    background: #ffffff;
-    border-radius: 18px;
-    padding: 30px;
-    box-shadow: 0 10px 30px rgba(0,0,0,.08);
+    background: #fff;
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: 0 6px 24px rgba(0,0,0,.06);
 }
 
 .widget-title {
     font-size: 18px;
     font-weight: 600;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
 }
 
 .sidebar ul {
@@ -96,7 +100,7 @@
 }
 
 .sidebar ul li {
-    margin-bottom: 14px;
+    margin-bottom: 12px;
 }
 
 .sidebar ul li a {
@@ -105,7 +109,7 @@
 }
 
 .sidebar ul li a:hover {
-    color: #38bdf8;
+    color: #0ea5e9;
 }
 
 /* Pagination */
@@ -115,8 +119,17 @@
 
 /* Mobile */
 @media (max-width: 768px) {
-    .search-meta {
-        padding: 26px;
+    .search-item {
+        flex-direction: column;
+        padding: 22px;
+    }
+
+    .search-thumb {
+        width: 100%;
+    }
+
+    .search-thumb img {
+        height: 200px;
     }
 }
 </style>
@@ -125,58 +138,47 @@
     <div class="container">
         <div class="row">
 
-            {{-- SEARCH RESULT --}}
+            {{-- SEARCH RESULTS --}}
             <div class="col-lg-8">
 
                 <h4 class="search-title">
-                    Search results for:
-                    <span>"{{ $keyword }}"</span>
+                    Search results for <span>"{{ $keyword }}"</span>
                 </h4>
 
                 @if($posts->count())
 
                     @foreach($posts as $post)
-                        <div class="search-card">
-                            <div class="row no-gutters">
+                        <div class="search-item">
 
-                                <div class="col-md-4 search-thumb">
-                                    <a href="{{ route('web.post', $post->slug) }}">
-                                        <img src="{{ $post->imageUrl() }}" alt="">
-                                    </a>
-                                </div>
-
-                                <div class="col-md-8 search-meta">
-
-                                    <h4>
-                                        <a href="{{ route('web.post', $post->slug) }}">
-                                            {{ $post->title }}
-                                        </a>
-                                    </h4>
-
-                                    <p>{{ $post->description }}</p>
-
-                                    <div>
-                                        <small>
-                                            <a class="bg-orange"
-                                               href="{{ route('web.category', $post->category->slug) }}">
-                                                {{ $post->category->name }}
-                                            </a>
-                                        </small>
-
-                                        <small>
-                                            {{ \Carbon\Carbon::parse($post->created_at)->format('d-m-Y') }}
-                                        </small>
-
-                                        <small>{{ $post->user->name }}</small>
-
-                                        <small>
-                                            <i class="fa fa-eye"></i> {{ $post->view_counts }}
-                                        </small>
-                                    </div>
-
-                                </div>
-
+                            <div class="search-thumb">
+                                <a href="{{ route('web.post', $post->slug) }}">
+                                    <img src="{{ $post->imageUrl() }}" alt="">
+                                </a>
                             </div>
+
+                            <div class="search-content">
+                                <h4>
+                                    <a href="{{ route('web.post', $post->slug) }}">
+                                        {{ $post->title }}
+                                    </a>
+                                </h4>
+
+                                <p>{{ $post->description }}</p>
+
+                                <div class="search-meta">
+                                    <small>
+                                        <a class="category"
+                                           href="{{ route('web.category', $post->category->slug) }}">
+                                            {{ $post->category->name }}
+                                        </a>
+                                    </small>
+
+                                    <small>{{ $post->user->name }}</small>
+                                    <small>{{ $post->created_at->format('d-m-Y') }}</small>
+                                    <small><i class="fa fa-eye"></i> {{ $post->view_counts }}</small>
+                                </div>
+                            </div>
+
                         </div>
                     @endforeach
 

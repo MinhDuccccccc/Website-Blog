@@ -248,7 +248,11 @@
                     </div>
                 </div>
             @endforeach
-
+            <div class="row mt-4">
+               <div class="col-md-12 text-center">
+                 {{ $new->links('pagination::bootstrap-4') }}
+               </div>
+            </div>
         </div>
     </div>
 </section>

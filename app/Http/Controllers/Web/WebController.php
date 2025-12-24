@@ -13,13 +13,18 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 class WebController extends Controller
 {
-    public function home()
-    {
-        $highlight = Post::where('highlight_post', 1)
-            ->take(3)->get();
-        $new = Post::where('new_post', 1)->take(10)->get();
-        return view('web.home', compact('highlight', 'new' ));
-    }
+   public function home()
+{
+    $highlight = Post::where('highlight_post', 1)
+        ->take(3)
+        ->get();
+
+    $new = Post::where('new_post', 1)
+        ->orderBy('created_at', 'desc')
+        ->paginate(5); // số bài / trang (bạn có thể đổi 5 → 6 / 10)
+
+    return view('web.home', compact('highlight', 'new'));
+}
 
     public function post($slug)
     {
