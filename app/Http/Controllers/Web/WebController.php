@@ -158,9 +158,8 @@ public function comment(Request $request, $id)
     $posts = Post::whereRaw(
     "MATCH(title, description, content) AGAINST (? IN BOOLEAN MODE)",
     [$keyword]
-    )->paginate(5);
+    )->paginate(5)->withQueryString();
     $categories = Category::all();
-
     return view('web.search', compact('posts', 'categories', 'keyword'));
 }
 
