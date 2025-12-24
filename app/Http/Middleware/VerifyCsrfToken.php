@@ -20,6 +20,7 @@ class VerifyCsrfToken extends Middleware
      'post/comment/*',
      'admin/user/store',
      'search',
+     'admin/post/update/{id}',
     // thêm route khác nếu cần test POST
 ];
 }
