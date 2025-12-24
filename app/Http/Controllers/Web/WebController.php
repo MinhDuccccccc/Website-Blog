@@ -21,7 +21,7 @@ class WebController extends Controller
 
     $new = Post::where('new_post', 1)
         ->orderBy('created_at', 'desc')
-        ->paginate(5); 
+        ->paginate(10); 
 
     return view('web.home', compact('highlight', 'new'));
 }
