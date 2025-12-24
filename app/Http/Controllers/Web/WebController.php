@@ -155,12 +155,10 @@ public function comment(Request $request, $id)
         return redirect()->route('web.home');
     }
 
-    $posts = Post::where('title', 'LIKE', "%{$keyword}%")
-        ->orWhere('description', 'LIKE', "%{$keyword}%")
-        ->orWhere('content', 'LIKE', "%{$keyword}%")
-        ->paginate(5)
-        ->appends(['keyword' => $keyword]); //giữ keyword khi chuyển trang
-
+    $posts = Post::whereRaw(
+    "MATCH(title, description, content) AGAINST (? IN BOOLEAN MODE)",
+    [$keyword]
+    )->paginate(5);
     $categories = Category::all();
 
     return view('web.search', compact('posts', 'categories', 'keyword'));
