@@ -4,128 +4,36 @@
 
 <style>
 /* ===== POST DETAIL ===== */
-.single-wrapper {
-    margin-top: 90px;
-}
+.single-wrapper { margin-top: 90px; }
+.blog-title-area { margin-bottom: 30px; }
+.blog-title-area h3 { font-size: 32px; font-weight: 700; margin: 16px 0; line-height: 1.4; }
+.blog-meta.big-meta small { margin-right: 16px; color: #64748b; }
+.single-post-media img { border-radius: 18px; margin: 30px 0; }
+.blog-content { background: #ffffff; border-radius: 20px; padding: 42px 48px; box-shadow: 0 12px 35px rgba(0,0,0,.08); }
+.blog-content p { font-size: 16px; line-height: 1.9; color: #334155; margin-bottom: 22px; }
+.custombox { margin-top: 60px; }
+.custombox .small-title { font-size: 22px; font-weight: 600; margin-bottom: 30px; }
+.custombox .blog-box { border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,.08); transition: .3s; }
+.custombox .blog-box:hover { transform: translateY(-4px); }
+.custombox .blog-meta { padding: 20px; }
 
-/* Header */
-.blog-title-area {
-    margin-bottom: 30px;
-}
+/* COMMENTS */
+.comments-list .comment-item { background: #f8fafc; border-radius: 16px; padding: 16px; margin-bottom: 15px; }
+.comment-reply { margin-left: 30px; }
+.comment-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.comment-author { font-weight: 600; }
+.comment-time { color: #64748b; margin-left: 6px; }
+.reply-btn { font-size: 13px; color: #2563eb; cursor: pointer; margin-left: 6px; }
+.comment-content { margin-top: 4px; color: #475569; line-height: 1.6; }
+.reply-form textarea { width: 100%; border-radius: 8px; padding: 6px; font-size: 14px; }
+.reply-form button { border-radius: 999px; padding: 4px 14px; }
 
-.blog-title-area h3 {
-    font-size: 32px;
-    font-weight: 700;
-    margin: 16px 0;
-    line-height: 1.4;
-}
+.sidebar .widget { background: #ffffff; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,.08); }
+.widget-title { font-size: 20px; font-weight: 600; margin-bottom: 25px; }
 
-.blog-meta.big-meta small {
-    margin-right: 16px;
-    color: #64748b;
-}
-
-/* Image */
-.single-post-media img {
-    border-radius: 18px;
-    margin: 30px 0;
-}
-
-/* Content */
-.blog-content {
-    background: #ffffff;
-    border-radius: 20px;
-    padding: 42px 48px;
-    box-shadow: 0 12px 35px rgba(0,0,0,.08);
-}
-
-.blog-content p {
-    font-size: 16px;
-    line-height: 1.9;
-    color: #334155;
-    margin-bottom: 22px;
-}
-
-/* Related posts */
-.custombox {
-    margin-top: 60px;
-}
-
-.custombox .small-title {
-    font-size: 22px;
-    font-weight: 600;
-    margin-bottom: 30px;
-}
-
-/* Related card */
-.custombox .blog-box {
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0,0,0,.08);
-    transition: .3s;
-}
-
-.custombox .blog-box:hover {
-    transform: translateY(-4px);
-}
-
-.custombox .blog-meta {
-    padding: 20px;
-}
-
-/* Comments */
-.comments-list .media {
-    background: #f8fafc;
-    border-radius: 14px;
-    padding: 20px 24px;
-    margin-bottom: 16px;
-}
-
-.comments-list h4 {
-    font-size: 15px;
-    font-weight: 600;
-}
-
-.comments-list p {
-    margin-top: 10px;
-    color: #475569;
-}
-
-/* Comment form */
-.form-wrapper textarea {
-    min-height: 120px;
-    border-radius: 14px;
-    padding: 16px;
-}
-
-.form-wrapper button {
-    padding: 10px 26px;
-    border-radius: 999px;
-}
-
-/* Sidebar */
-.sidebar .widget {
-    background: #ffffff;
-    border-radius: 20px;
-    padding: 30px;
-    box-shadow: 0 10px 30px rgba(0,0,0,.08);
-}
-
-.widget-title {
-    font-size: 20px;
-    font-weight: 600;
-    margin-bottom: 25px;
-}
-
-/* Mobile */
 @media (max-width: 768px) {
-    .blog-title-area h3 {
-        font-size: 24px;
-    }
-
-    .blog-content {
-        padding: 26px;
-    }
+    .blog-title-area h3 { font-size: 24px; }
+    .blog-content { padding: 26px; }
 }
 </style>
 
@@ -135,7 +43,6 @@
 
             {{-- MAIN --}}
             <div class="col-lg-9">
-
                 <div class="page-wrapper">
 
                     {{-- TITLE --}}
@@ -155,7 +62,7 @@
                         <h3>{{ $post->title }}</h3>
 
                         <div class="blog-meta big-meta">
-                            <small>{{ \Carbon\Carbon::parse($post->created_at)->format('d-m-Y') }}</small>
+                            <small>{{ $post->created_at->format('d-m-Y') }}</small>
                             <small>{{ $post->user->name }}</small>
                             <small><i class="fa fa-eye"></i> {{ $post->view_counts }}</small>
                         </div>
@@ -163,7 +70,7 @@
 
                     {{-- IMAGE --}}
                     <div class="single-post-media">
-                        <img src="{{ $post->imageUrl() }}" alt="" class="img-fluid">
+                        <img src="{{ $post->imageUrl() }}" class="img-fluid">
                     </div>
 
                     {{-- CONTENT --}}
@@ -190,7 +97,7 @@
                                                     {{ $item->title }}
                                                 </a>
                                             </h4>
-                                            <small>{{ \Carbon\Carbon::parse($item->created_at)->format('d-m-Y') }}</small>
+                                            <small>{{ $item->created_at->format('d-m-Y') }}</small>
                                             <small>{{ $item->user->name }}</small>
                                         </div>
                                     </div>
@@ -203,31 +110,32 @@
                     <div class="custombox clearfix">
                         <h4 class="small-title">{{ $post->comments()->count() }} Comments</h4>
                         <div class="comments-list">
-                            @foreach($post->comments as $comment)
-                                <div class="media">
-                                    <div class="media-body">
-                                        <h4>
-                                            {{ $comment->user->name }}
-                                            <small> · {{ \Carbon\Carbon::parse($comment->created_at)->format('d-m-Y') }}</small>
-                                        </h4>
-                                        <p>{{ $comment->content }}</p>
-                                    </div>
-                                </div>
+                            @foreach($comments as $comment)
+                                @include('web.partials.comment', [
+                                    'comment' => $comment,
+                                    'level' => 0,
+                                    'post' => $post
+                                ])
                             @endforeach
+
+                            {{-- PAGINATION --}}
+                            <div class="mt-3">
+                                {{ $comments->links('pagination::bootstrap-4') }}
+                            </div>
                         </div>
                     </div>
 
                     {{-- COMMENT FORM --}}
                     @auth
                         <div class="custombox clearfix">
-                            <h4 class="small-title">Leave a Reply</h4>
-                            <form class="form-wrapper" method="post"
-                                  action="{{ route('web.post.comment', $post->id) }}">
+                            <h4 class="small-title">Leave a Comment</h4>
+                            <form class="form-wrapper" method="post" action="{{ route('web.post.comment', $post->id) }}">
                                 @csrf
                                 <textarea class="form-control"
                                           id="comment-content"
                                           name="content"
-                                          placeholder="Write your comment..."></textarea>
+                                          placeholder="Write your comment..."
+                                          required></textarea>
                                 <button type="submit"
                                         class="btn btn-primary mt-3"
                                         id="submit-comment"
@@ -236,17 +144,6 @@
                                 </button>
                             </form>
                         </div>
-
-                        <script>
-                            document.addEventListener("DOMContentLoaded", function () {
-                                const textarea = document.getElementById("comment-content");
-                                const submitBtn = document.getElementById("submit-comment");
-
-                                textarea.addEventListener("input", function () {
-                                    submitBtn.disabled = textarea.value.trim().length === 0;
-                                });
-                            });
-                        </script>
                     @endauth
 
                 </div>
@@ -280,5 +177,28 @@
         </div>
     </div>
 </section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const textarea = document.getElementById("comment-content");
+    const submitBtn = document.getElementById("submit-comment");
+
+    if (textarea) {
+        textarea.addEventListener("input", function () {
+            submitBtn.disabled = textarea.value.trim().length === 0;
+        });
+    }
+});
+
+function toggleReplyForm(commentId) {
+    const form = document.getElementById('reply-form-' + commentId);
+    form.style.display = form.style.display === 'block' ? 'none' : 'block';
+}
+
+function toggleReplyList(commentId) {
+    const list = document.getElementById('reply-list-' + commentId);
+    list.style.display = list.style.display === 'block' ? 'none' : 'block';
+}
+</script>
 
 @endsection
