@@ -1,65 +1,120 @@
 @extends('admin.layout.master')
+
 @section('content')
 <div id="page-wrapper">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <h1 class="page-header">Post
-                            <small>Add</small>
-                        </h1>
-                        @if(count($errors))
-                        <div class="alert alert-danger">
-                            @foreach($errors->all() as $err)
-                                {{$err}}
-                            @endforeach
-                        </div>
-                    @endif
+    <div class="container-fluid">
+
+        {{-- PAGE HEADER --}}
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">
+                    Post <small>Add new</small>
+                </h1>
+            </div>
+        </div>
+
+        {{-- ERRORS --}}
+        @if($errors->any())
+            <div class="alert alert-danger">
+                @foreach($errors->all() as $err)
+                    <div>{{ $err }}</div>
+                @endforeach
+            </div>
+        @endif
+
+        {{-- FORM --}}
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="panel panel-default shadow-sm">
+                    <div class="panel-heading">
+                        <strong>Create Post</strong>
                     </div>
-                    <!-- /.col-lg-12 -->
-                    <div class="col-lg-7" style="padding-bottom:120px">
-                        <form action="{{ route('admin.post.store') }}" method="POST" enctype="multipart/form-data">
+
+                    <div class="panel-body">
+                        <form action="{{ route('admin.post.store') }}"
+                              method="POST"
+                              enctype="multipart/form-data">
                             @csrf
+
                             <div class="form-group">
                                 <label>Category</label>
                                 <select class="form-control" name="category_id">
                                     @foreach ($categories as $category)
-                                       <option value="{{$category->id}}">{{ $category->name }}</option>
+                                        <option value="{{ $category->id }}">
+                                            {{ $category->name }}
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>
+
                             <div class="form-group">
                                 <label>Title</label>
-                                <input class="form-control" name="title" placeholder="Please Enter Title" />
+                                <input type="text"
+                                       class="form-control"
+                                       name="title"
+                                       placeholder="Enter post title"
+                                       value="{{ old('title') }}">
                             </div>
+
                             <div class="form-group">
                                 <label>Description</label>
-                                <input class="form-control" name="description" placeholder="Please Enter Description" />
+                                <input type="text"
+                                       class="form-control"
+                                       name="description"
+                                       placeholder="Short description"
+                                       value="{{ old('description') }}">
                             </div>
-                            <div class="form-group">
-                                <label>New Post</label>
-                                <input type= "checkbox" name="new_post" />
+
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="checkbox">
+                                        <label>
+                                            <input type="checkbox" name="new_post">
+                                            New Post
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="checkbox">
+                                        <label>
+                                            <input type="checkbox" name="highlight_post">
+                                            Highlight Post
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label>Highlight Post</label>
-                                <input type= "checkbox" name="highlight_post" />
-                            </div>
+
                             <div class="form-group">
                                 <label>Image</label>
-                                <input type= "file" class="form-control" name="image" accept="image/*" />
+                                <input type="file"
+                                       class="form-control"
+                                       name="image"
+                                       accept="image/*">
                             </div>
+
                             <div class="form-group">
                                 <label>Content</label>
-                                <textarea id="content" name="content" class="ckeditor"></textarea>
+                                <textarea id="content"
+                                          name="content"
+                                          class="ckeditor"></textarea>
                             </div>
-                            <button type="submit" class="btn btn-default">Add</button>
+
+                            <div class="text-right">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fa fa-save"></i> Publish
+                                </button>
+                                <a href="{{ route('admin.post.index') }}" class="btn btn-default">
+                                    Cancel
+                                </a>
+                            </div>
+
                         </form>
                     </div>
                 </div>
-                <!-- /.row -->
             </div>
-            <!-- /.container-fluid -->
         </div>
-        <!-- /#page-wrapper -->
 
     </div>
+</div>
 @endsection

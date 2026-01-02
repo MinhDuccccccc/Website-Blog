@@ -1,68 +1,86 @@
 @extends('admin.layout.master')
+
 @section('content')
-    <div id="page-wrapper">
-        <div class="container-fluid">
-            <div class="row">
+<div id="page-wrapper">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">
+                    Category <small>Edit</small>
+                </h1>
+            </div>
+
+            @if(count($errors))
                 <div class="col-lg-12">
-                    <h1 class="page-header">Category
-                        <small>Edit</small>
-                    </h1>
-                </div>
-                <!-- /.col-lg-12 -->
-                @if (count($errors))
                     <div class="alert alert-danger">
-                        @foreach ($errors->all() as $err)
-                            {{ $err }}
+                        @foreach($errors->all() as $err)
+                            <p>{{ $err }}</p>
                         @endforeach
                     </div>
-                @endif
-                @if (session('success'))
+                </div>
+            @endif
+
+            @if(session('success'))
+                <div class="col-lg-12">
                     <div class="alert alert-success">
                         {{ session('success') }}
                     </div>
-                @endif
-                <!-- /.col-lg-12 -->
-                <div class="col-lg-7" style="padding-bottom:120px">
-                    <form id="category-form" action="{{ route('admin.category.update', $category->id) }}" method="POST">
-                        @csrf
-                        @method('put')
+                </div>
+            @endif
 
-                        <div class="form-group">
-                            <label>Category Name</label>
-                            <input id="name" class="form-control" name="name" value="{{ $category->name }}"
-                                placeholder="Please Enter Category Name" />
-                        </div>
+            <div class="col-lg-6">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <i class="fa fa-edit"></i> Edit Category
+                    </div>
 
-                        <button id="update-btn" type="submit" class="btn btn-default" disabled>Update</button>
-                    </form>
+                    <div class="panel-body">
+                        <form id="category-form"
+                              action="{{ route('admin.category.update', $category->id) }}"
+                              method="POST">
+                            @csrf
+                            @method('PUT')
 
-                    <script>
-                        document.addEventListener("DOMContentLoaded", function() {
-                            const originalName = @json($category->name);
-                            const nameInput = document.getElementById("name");
-                            const updateBtn = document.getElementById("update-btn");
+                            <div class="form-group">
+                                <label>Category Name</label>
+                                <input id="name"
+                                       class="form-control"
+                                       name="name"
+                                       value="{{ $category->name }}"
+                                       placeholder="Enter category name">
+                            </div>
 
-                            function checkChanged() {
-                                if (nameInput.value.trim() !== originalName.trim()) {
-                                    updateBtn.disabled = false;
-                                } else {
-                                    updateBtn.disabled = true;
-                                }
-                            }
-
-                            nameInput.addEventListener("input", checkChanged);
-
-                            // Gọi kiểm tra 1 lần lúc load để thiết lập trạng thái ban đầu
-                            checkChanged();
-                        });
-                    </script>
+                            <button id="update-btn"
+                                    type="submit"
+                                    class="btn btn-primary"
+                                    disabled>
+                                <i class="fa fa-save"></i> Update
+                            </button>
+                            <a href="{{ route('admin.category.index') }}"
+                               class="btn btn-default">
+                                Cancel
+                            </a>
+                        </form>
+                    </div>
                 </div>
             </div>
-            <!-- /.row -->
-        </div>
-        <!-- /.container-fluid -->
-    </div>
-    <!-- /#page-wrapper -->
 
+        </div>
     </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const originalName = @json($category->name);
+    const nameInput = document.getElementById("name");
+    const updateBtn = document.getElementById("update-btn");
+
+    function checkChanged() {
+        updateBtn.disabled = nameInput.value.trim() === originalName.trim();
+    }
+
+    nameInput.addEventListener("input", checkChanged);
+    checkChanged();
+});
+</script>
 @endsection

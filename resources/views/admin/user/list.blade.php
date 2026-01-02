@@ -1,68 +1,81 @@
 @extends('admin.layout.master')
 
-@section('title')
-  User
-@endsection
+@section('title', 'User')
 
 @section('content')
 <div id="page-wrapper">
     <div class="container-fluid">
+
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header">User
+                <h1 class="page-header">
+                    <i class="fa fa-users"></i> User
                     <small>List</small>
                 </h1>
             </div>
-
-            @if(session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
-                </div>
-            @endif
-
-            <table class="table table-striped table-bordered table-hover">
-                <thead>
-                    <tr align="center">
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Is admin</th>
-                        <th>Delete</th>
-                        <th>Edit</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    @foreach($users as $user)
-                    <tr class="odd gradeX" align="center">
-                        <td>{{ $user->id }}</td>
-                        <td>{{ $user->name }}</td>
-                        <td>{{ $user->email }}</td>
-                        <td>{{ $user->is_admin ? "x" : "" }}</td>
-
-                        <td class="center">
-                            <i class="fa fa-trash-o fa-fw"></i>
-                            <a href="{{ route('admin.user.delete', $user->id) }}">Delete</a>
-                        </td>
-
-                        <td class="center">
-                            <i class="fa fa-pencil fa-fw"></i>
-                            <a href="{{ route('admin.user.edit', $user->id) }}">Edit</a>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-
-            {{-- Pagination nằm bên phải --}}
-            <div class="row">
-    <div class="col-lg-12 text-right">
-        {{ $users->links('pagination::bootstrap-4') }}
-    </div>
-</div>
-
-
         </div>
+
+        @if(session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <span><i class="fa fa-list"></i> User List</span>
+                <a href="{{ route('admin.user.create') }}" class="btn btn-sm btn-primary pull-right">
+                    <i class="fa fa-plus"></i> Add User
+                </a>
+            </div>
+
+            <div class="panel-body">
+                <table class="table table-striped table-bordered table-hover">
+                    <thead>
+                        <tr class="text-center">
+                            <th width="60">ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th width="100">Role</th>
+                            <th width="120">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($users as $user)
+                        <tr class="text-center">
+                            <td>{{ $user->id }}</td>
+                            <td class="text-left">{{ $user->name }}</td>
+                            <td class="text-left">{{ $user->email }}</td>
+                            <td>
+                                @if($user->is_admin)
+                                    <span class="label label-danger">Admin</span>
+                                @else
+                                    <span class="label label-info">User</span>
+                                @endif
+                            </td>
+                            <td>
+                                <a href="{{ route('admin.user.edit', $user->id) }}"
+                                   class="btn btn-xs btn-warning">
+                                    <i class="fa fa-pencil"></i>
+                                </a>
+
+                                <a href="{{ route('admin.user.delete', $user->id) }}"
+                                   class="btn btn-xs btn-danger"
+                                   onclick="return confirm('Delete this user?')">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+
+                <div class="text-right">
+                    {{ $users->links('pagination::bootstrap-4') }}
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 @endsection

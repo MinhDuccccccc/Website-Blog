@@ -1,58 +1,100 @@
 @extends('admin.layout.master')
+
 @section('content')
 <div id="page-wrapper">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <h1 class="page-header">User
-                            <small>Add</small>
-                        </h1>
+    <div class="container-fluid">
+
+        {{-- PAGE HEADER --}}
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">
+                    User <small>Add new</small>
+                </h1>
+            </div>
+        </div>
+
+        {{-- ERRORS --}}
+        @if($errors->any())
+            <div class="alert alert-danger">
+                @foreach($errors->all() as $err)
+                    <div>{{ $err }}</div>
+                @endforeach
+            </div>
+        @endif
+
+        {{-- FORM --}}
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="panel panel-default shadow-sm">
+                    <div class="panel-heading">
+                        <strong>Create User</strong>
                     </div>
-                    @if(count($errors))
-                        <div class="alert alert-danger">
-                            @foreach($errors->all() as $err)
-                                {{$err}}
-                            @endforeach
-                        </div>
-                    @endif
-                    <!-- /.col-lg-12 -->
-                    <div class="col-lg-7" style="padding-bottom:120px">
-                        <form action="{{route('admin.user.store')}}" method="POST">
+
+                    <div class="panel-body">
+                        <form action="{{ route('admin.user.store') }}" method="POST">
                             @csrf
+
                             <div class="form-group">
                                 <label>Name</label>
-                                <input class="form-control" name="name" placeholder="Please Enter Name" />
+                                <input type="text"
+                                       class="form-control"
+                                       name="name"
+                                       placeholder="Enter full name"
+                                       value="{{ old('name') }}">
                             </div>
+
                             <div class="form-group">
                                 <label>Email</label>
-                                <input class="form-control" name="email" type="email" placeholder="Please Enter Email" />
+                                <input type="email"
+                                       class="form-control"
+                                       name="email"
+                                       placeholder="Enter email address"
+                                       value="{{ old('email') }}">
                             </div>
+
                             <div class="form-group">
                                 <label>Password</label>
-                                <input class="form-control" name="password" type="password" placeholder="Please Enter Password" />
+                                <input type="password"
+                                       class="form-control"
+                                       name="password"
+                                       placeholder="Enter password">
                             </div>
+
                             <div class="form-group">
-                                <label>Confirm</label>
-                                <input class="form-control" name="password" type="password" placeholder="Please Confirm" />
+                                <label>Confirm Password</label>
+                                <input type="password"
+                                       class="form-control"
+                                       name="password_confirmation"
+                                       placeholder="Confirm password">
                             </div>
+
                             <div class="form-group">
-                                <label>Role</label>
+                                <label>Role</label><br>
                                 <label class="radio-inline">
-                                    <input name="is_admin" value="0" checked type="radio">User
+                                    <input type="radio" name="is_admin" value="0" checked>
+                                    User
                                 </label>
                                 <label class="radio-inline">
-                                    <input name="is_admin" value="1" type="radio">Admin
+                                    <input type="radio" name="is_admin" value="1">
+                                    Admin
                                 </label>
                             </div>
-                            <button type="submit" class="btn btn-default">Add</button>
-                        <form>
+
+                            <div class="text-right">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fa fa-user-plus"></i> Create User
+                                </button>
+                                <a href="{{ route('admin.user.index') }}" class="btn btn-default">
+                                    Cancel
+                                </a>
+                            </div>
+
+                        </form>
                     </div>
                 </div>
-                <!-- /.row -->
             </div>
-            <!-- /.container-fluid -->
         </div>
-        <!-- /#page-wrapper -->
 
     </div>
+</div>
 @endsection
