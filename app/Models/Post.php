@@ -19,6 +19,14 @@ class Post extends Model
         'slug',
         'category_id',
         'highlight_post',
+        'comments_count',
+    ];
+    
+    protected $casts = [
+        'view_counts'     => 'integer',
+        'comments_count' => 'integer',
+        'new_post'        => 'boolean',
+        'highlight_post' => 'boolean',
     ];
 
     public function user()

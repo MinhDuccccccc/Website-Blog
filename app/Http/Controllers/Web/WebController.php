@@ -11,6 +11,7 @@ use App\Models\Contact;
 use App\Models\Post;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\DB;
 
 class WebController extends Controller
 {
@@ -103,6 +104,13 @@ class WebController extends Controller
             'post_id'   => $postId,
             'parent_id' => $request->parent_id
         ]);
+
+        /**
+         * TỐI ƯU SELECT COUNT
+         * → tăng comments_count thay vì COUNT(*)
+         * → O(1), không scan bảng comments
+         */
+        DB::table('posts')->increment('comments_count');
 
         /**
          * Kafka payload
