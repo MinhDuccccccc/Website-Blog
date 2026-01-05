@@ -6,8 +6,10 @@
             <div class="col-lg-7">
                 <div class="widget">
                     <div class="footer-text text-left">
-                        <a href="/">
-                            <img src="web/images/version/tech-footer-logo.png" alt="Tech Blog" class="img-fluid">
+                        <a href="{{ url('/') }}">
+                            <img src="{{ asset('web/images/version/tech-footer-logo.png') }}"
+                                 alt="Tech Blog"
+                                 class="img-fluid">
                         </a>
 
                         <p>
