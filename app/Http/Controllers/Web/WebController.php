@@ -17,11 +17,14 @@ class WebController extends Controller
 {
     public function home()
     {
-        $highlight = Post::where('highlight_post', 1)
+        // Eager loading user để tránh N+1 nếu hiển thị tác giả
+        $highlight = Post::with('user')
+            ->where('highlight_post', 1)
             ->take(3)
             ->get();
 
-        $new = Post::where('new_post', 1)
+        $new = Post::with('user')
+            ->where('new_post', 1)
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
@@ -29,48 +32,82 @@ class WebController extends Controller
     }
 
     public function post($slug)
-{
-    $post = Post::where('slug', $slug)->firstOrFail();
+    {
+        // eager loading category + user
+        $post = Post::with(['category', 'user'])
+            ->where('slug', $slug)
+            ->firstOrFail();
 
-    // tăng view
-    $post->increment('view_counts');
+        // tăng view
+        $post->increment('view_counts');
 
-    // Related posts
-    $relate = Post::where('category_id', $post->category_id)
-        ->where('id', '!=', $post->id)
-        ->inRandomOrder()
-        ->take(2)
-        ->get();
+        // Related posts (eager loading category)
+        $relate = Post::with('category')
+            ->where('category_id', $post->category_id)
+            ->where('id', '!=', $post->id)
+            ->inRandomOrder()
+            ->take(2)
+            ->get();
 
-    // Highlight posts
-    $highlight = Post::where('highlight_post', 1)
-        ->take(3)
-        ->get();
+        $highlight = Post::with('user')
+            ->where('highlight_post', 1)
+            ->take(3)
+            ->get();
 
-    /**
-     * LOAD COMMENT CHA + REPLIES
-     * Chỉ phân trang comment cha
-     */
-    $comments = Comment::with(['user', 'replies.user'])
-        ->where('post_id', $post->id)
-        ->whereNull('parent_id')
-        ->orderBy('created_at', 'desc')
-        ->paginate(5); // mỗi trang 5 comment cha
+        // Eager loading comments
+        $comments = Comment::with(['user', 'replies.user'])
+            ->where('post_id', $post->id)
+            ->whereNull('parent_id')
+            ->orderBy('created_at', 'desc')
+            ->paginate(5);
 
-    return view('web.post', compact(
-        'post',
-        'relate',
-        'highlight',
-        'comments'
-    ));
-}
-
+        return view('web.post', compact(
+            'post',
+            'relate',
+            'highlight',
+            'comments'
+        ));
+    }
 
     /**
      * ===============================
-     * COMMENT – reply tối đa 4 cấp
+     * CATEGORY – ĐIỂM TEST EAGER LOADING CHÍNH
      * ===============================
      */
+    public function category()
+    {
+        /**
+         * TRƯỚC (N+1):
+         * Post::paginate(4);
+         *
+         * SAU (EAGER LOADING):
+         * → load sẵn category + user
+         */
+        $posts = Post::with(['category', 'user'])
+            ->paginate(4);
+
+        $categories = Category::all();
+
+        return view('web.category', compact('posts', 'categories'));
+    }
+
+    public function categorySlug($slug)
+    {
+        $category = Category::where('slug', $slug)->firstOrFail();
+
+        /**
+         * EAGER LOADING category + user
+         * → tránh N+1 khi lặp posts trong view
+         */
+        $posts = Post::with(['category', 'user'])
+            ->where('category_id', $category->id)
+            ->paginate(4);
+
+        $categories = Category::all();
+
+        return view('web.category', compact('posts', 'categories'));
+    }
+
     public function comment(Request $request, $postId)
     {
         $request->validate([
@@ -78,9 +115,6 @@ class WebController extends Controller
             'parent_id' => 'nullable|exists:comments,id'
         ]);
 
-        /**
-         * CHẶN REPLY > CẤP 3
-         */
         if ($request->parent_id) {
             $parent = Comment::findOrFail($request->parent_id);
             $level = 0;
@@ -97,7 +131,6 @@ class WebController extends Controller
             }
         }
 
-        // Lưu MySQL
         $comment = Comment::create([
             'content'   => $request->content,
             'user_id'   => Auth::id(),
@@ -105,65 +138,12 @@ class WebController extends Controller
             'parent_id' => $request->parent_id
         ]);
 
-        /**
-         * TỐI ƯU SELECT COUNT
-         * → tăng comments_count thay vì COUNT(*)
-         * → O(1), không scan bảng comments
-         */
-        DB::table('posts')->increment('comments_count');
-
-        /**
-         * Kafka payload
-         */
-        $payload = [
-            'comment_id' => $comment->id,
-            'post_id'    => $comment->post_id,
-            'user_id'    => $comment->user_id,
-            'user_name'  => Auth::user()->name ?? 'Anonymous',
-            'content'    => $comment->content,
-            'parent_id'  => $comment->parent_id,
-            'created_at' => now()->toDateTimeString()
-        ];
-
-        try {
-            $response = Http::withHeaders([
-                'Content-Type' => 'application/vnd.kafka.json.v2+json',
-                'Accept'       => 'application/vnd.kafka.v2+json',
-            ])->post('http://localhost:8082/topics/comment-created', [
-                'records' => [
-                    ['value' => $payload]
-                ]
-            ]);
-
-            Log::info('Comment sent to Kafka', [
-                'status'  => $response->status(),
-                'payload' => $payload
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Kafka comment error: ' . $e->getMessage());
-        }
+        // TỐI ƯU SELECT COUNT
+        DB::table('posts')
+            ->where('id', $postId)
+            ->increment('comments_count');
 
         return back();
-    }
-
-    public function category()
-    {
-        $posts = Post::paginate(4);
-        $categories = Category::all();
-
-        return view('web.category', compact('posts', 'categories'));
-    }
-
-    public function categorySlug($slug)
-    {
-        $category = Category::where('slug', $slug)->firstOrFail();
-
-        $posts = Post::where('category_id', $category->id)
-            ->paginate(4);
-
-        $categories = Category::all();
-
-        return view('web.category', compact('posts', 'categories'));
     }
 
     public function contact()
@@ -181,35 +161,7 @@ class WebController extends Controller
             'message' => 'required|string|max:1000',
         ]);
 
-        $contact = Contact::create($validated);
-
-        $payload = [
-            'contact_id' => $contact->id,
-            'name'       => $contact->name,
-            'address'    => $contact->address,
-            'phone'      => $contact->phone,
-            'subject'    => $contact->subject,
-            'message'    => $contact->message,
-            'created_at' => now()->toDateTimeString(),
-        ];
-
-        try {
-            $response = Http::withHeaders([
-                'Content-Type' => 'application/vnd.kafka.json.v2+json',
-                'Accept'       => 'application/vnd.kafka.v2+json',
-            ])->post('http://localhost:8082/topics/contact-created', [
-                'records' => [
-                    ['value' => $payload]
-                ]
-            ]);
-
-            Log::info('Contact sent to Kafka', [
-                'status'  => $response->status(),
-                'payload' => $payload
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Kafka contact error: ' . $e->getMessage());
-        }
+        Contact::create($validated);
 
         return redirect()
             ->route('web.contact')
@@ -224,10 +176,13 @@ class WebController extends Controller
             return redirect()->route('web.home');
         }
 
-        $posts = Post::whereRaw(
-            "MATCH(title, description, content) AGAINST (? IN BOOLEAN MODE)",
-            [$keyword]
-        )->paginate(10)->withQueryString();
+        $posts = Post::with(['category', 'user'])
+            ->whereRaw(
+                "MATCH(title, description, content) AGAINST (? IN BOOLEAN MODE)",
+                [$keyword]
+            )
+            ->paginate(10)
+            ->withQueryString();
 
         $categories = Category::all();
 
