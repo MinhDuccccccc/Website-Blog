@@ -12,6 +12,7 @@ use App\Models\Post;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class WebController extends Controller
 {
@@ -91,21 +92,27 @@ class WebController extends Controller
         return view('web.category', compact('posts', 'categories'));
     }
 
-    public function categorySlug($slug)
+      public function categorySlug($slug)
     {
-        $category = Category::where('slug', $slug)->firstOrFail();
+        // page hiện tại (pagination)
+        $page = request()->get('page', 1);
 
-        /**
-         * EAGER LOADING category + user
-         * → tránh N+1 khi lặp posts trong view
-         */
-        $posts = Post::with(['category', 'user'])
-            ->where('category_id', $category->id)
-            ->paginate(4);
+        // cache key duy nhất cho mỗi category + page
+        $cacheKey = "category_{$slug}_posts_page_{$page}";
 
-        $categories = Category::all();
+        $data = Cache::remember($cacheKey, 60, function () use ($slug) {
+            $category = Category::where('slug', $slug)->firstOrFail();
 
-        return view('web.category', compact('posts', 'categories'));
+            $posts = Post::with(['category', 'user'])
+                ->where('category_id', $category->id)
+                ->paginate(4);
+
+            $categories = Category::all();
+
+            return compact('category', 'posts', 'categories');
+        });
+
+        return view('web.category', $data);
     }
 
     public function comment(Request $request, $postId)
