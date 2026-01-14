@@ -16,21 +16,28 @@ use Illuminate\Support\Facades\Cache;
 
 class WebController extends Controller
 {
-    public function home()
-    {
-        // Eager loading user để tránh N+1 nếu hiển thị tác giả
-        $highlight = Post::with('user')
-            ->where('highlight_post', 1)
-            ->take(3)
-            ->get();
+    
+public function home()
+{
+    $highlight = Post::with('user')
+        ->where('highlight_post', 1)
+        ->orderBy('created_at', 'desc')
+        ->limit(3)
+        ->get();
 
-        $new = Post::with('user')
-            ->where('new_post', 1)
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+    $new = Post::with('user')
+        ->where('new_post', 1)
+        ->orderBy('created_at', 'desc')
+        ->paginate(
+            10,                 // per page
+            ['*'],              // columns
+            'page',             // page name
+            request()->get('page', 1)
+        );
 
-        return view('web.home', compact('highlight', 'new'));
-    }
+    return view('web.home', compact('highlight', 'new'));
+}
+
 
     public function post($slug)
     {
