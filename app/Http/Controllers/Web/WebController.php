@@ -176,44 +176,27 @@ class WebController extends Controller
     }
 
     public function search(Request $request)
-{
-    $keyword = trim($request->get('keyword'));
+    {
+        $keyword = $request->get('keyword');
 
-    if (!$keyword) {
-        return redirect()->route('web.home');
+        if (!$keyword) {
+            return redirect()->route('web.home');
+        }
+
+        $posts = Post::with(['category', 'user'])
+            ->whereRaw(
+                "MATCH(title, description, content) AGAINST (? IN BOOLEAN MODE)",
+                [$keyword]
+            )
+            ->paginate(10)
+            ->withQueryString();
+
+        $categories = Category::all();
+
+        return view('web.search', compact(
+            'posts',
+            'categories',
+            'keyword'
+        ));
     }
-
-    $posts = Post::query()
-        ->select(
-            'id',
-            'title',
-            'slug',
-            'description',
-            'image',          
-            'category_id',
-            'user_id',
-            'created_at'
-        )
-        ->with([
-            'category:id,name,slug',
-            'user:id,name'
-        ])
-        ->whereRaw(
-            "MATCH(title, description, content) AGAINST (? IN BOOLEAN MODE)",
-            [$keyword . '*']
-        )
-        ->orderByDesc('created_at')
-        ->paginate(10)
-        ->withQueryString();
-
-    // categories ít thay đổi → không ảnh hưởng benchmark SQL search
-    $categories = Category::select('id', 'name', 'slug')->get();
-
-    return view('web.search', compact(
-        'posts',
-        'categories',
-        'keyword'
-    ));
-}
-
 }
