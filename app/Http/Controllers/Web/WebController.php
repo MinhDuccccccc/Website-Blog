@@ -184,8 +184,20 @@ class WebController extends Controller
     }
 
     $posts = Post::query()
-        ->select('id', 'title', 'slug', 'description', 'category_id', 'user_id', 'created_at')
-        ->with(['category:id,name,slug', 'user:id,name'])
+        ->select(
+            'id',
+            'title',
+            'slug',
+            'description',
+            'image',          
+            'category_id',
+            'user_id',
+            'created_at'
+        )
+        ->with([
+            'category:id,name,slug',
+            'user:id,name'
+        ])
         ->whereRaw(
             "MATCH(title, description, content) AGAINST (? IN BOOLEAN MODE)",
             [$keyword . '*']
@@ -194,7 +206,7 @@ class WebController extends Controller
         ->paginate(10)
         ->withQueryString();
 
-    // categories ít thay đổi → có thể cache riêng nếu muốn
+    // categories ít thay đổi → không ảnh hưởng benchmark SQL search
     $categories = Category::select('id', 'name', 'slug')->get();
 
     return view('web.search', compact(
