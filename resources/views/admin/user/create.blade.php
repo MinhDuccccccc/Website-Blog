@@ -40,6 +40,7 @@
                                        class="form-control"
                                        name="name"
                                        placeholder="Enter full name"
+                                       required
                                        value="{{ old('name') }}">
                             </div>
 
@@ -49,6 +50,7 @@
                                        class="form-control"
                                        name="email"
                                        placeholder="Enter email address"
+                                       required
                                        value="{{ old('email') }}">
                             </div>
 
@@ -57,25 +59,33 @@
                                 <input type="password"
                                        class="form-control"
                                        name="password"
-                                       placeholder="Enter password">
+                                       placeholder="Enter password"
+                                       required>
                             </div>
 
                             <div class="form-group">
                                 <label>Confirm Password</label>
                                 <input type="password"
                                        class="form-control"
-                                       name="password_confirmation"
-                                       placeholder="Confirm password">
+                                       name="confirm"
+                                       placeholder="Confirm password"
+                                       required>
                             </div>
 
                             <div class="form-group">
                                 <label>Role</label><br>
                                 <label class="radio-inline">
-                                    <input type="radio" name="is_admin" value="0" checked>
+                                    <input type="radio"
+                                           name="is_admin"
+                                           value="0"
+                                           {{ old('is_admin', 0) == 0 ? 'checked' : '' }}>
                                     User
                                 </label>
-                                <label class="radio-inline">
-                                    <input type="radio" name="is_admin" value="1">
+                                <label class="radio-inline" style="margin-left:15px;">
+                                    <input type="radio"
+                                           name="is_admin"
+                                           value="1"
+                                           {{ old('is_admin') == 1 ? 'checked' : '' }}>
                                     Admin
                                 </label>
                             </div>

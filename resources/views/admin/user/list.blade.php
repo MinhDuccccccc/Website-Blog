@@ -21,10 +21,17 @@
             </div>
         @endif
 
+        @if($errors->any())
+            <div class="alert alert-danger">
+                {{ $errors->first() }}
+            </div>
+        @endif
+
         <div class="panel panel-default">
             <div class="panel-heading">
                 <span><i class="fa fa-list"></i> User List</span>
-                <a href="{{ route('admin.user.create') }}" class="btn btn-sm btn-primary pull-right">
+                <a href="{{ route('admin.user.create') }}"
+                   class="btn btn-sm btn-primary pull-right">
                     <i class="fa fa-plus"></i> Add User
                 </a>
             </div>
@@ -41,7 +48,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($users as $user)
+                        @forelse($users as $user)
                         <tr class="text-center">
                             <td>{{ $user->id }}</td>
                             <td class="text-left">{{ $user->name }}</td>
@@ -54,19 +61,32 @@
                                 @endif
                             </td>
                             <td>
-                                <a href="{{ route('admin.user.edit', $user->id) }}"
-                                   class="btn btn-xs btn-warning">
-                                    <i class="fa fa-pencil"></i>
-                                </a>
+                                {{-- CHỈ USER THƯỜNG MỚI ĐƯỢC THAO TÁC --}}
+                                @if(!$user->is_admin)
+                                    {{-- EDIT --}}
+                                    <a href="{{ route('admin.user.edit', $user->id) }}"
+                                       class="btn btn-xs btn-warning">
+                                        <i class="fa fa-pencil"></i>
+                                    </a>
 
-                                <a href="{{ route('admin.user.delete', $user->id) }}"
-                                   class="btn btn-xs btn-danger"
-                                   onclick="return confirm('Delete this user?')">
-                                    <i class="fa fa-trash"></i>
-                                </a>
+                                    {{-- DELETE (GET route) --}}
+                                    <a href="{{ route('admin.user.delete', $user->id) }}"
+                                       class="btn btn-xs btn-danger"
+                                       onclick="return confirm('Delete this user?')">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                @else
+                                    <span class="text-muted">—</span>
+                                @endif
                             </td>
                         </tr>
-                        @endforeach
+                        @empty
+                        <tr>
+                            <td colspan="5" class="text-center">
+                                No users found
+                            </td>
+                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
 

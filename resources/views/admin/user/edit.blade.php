@@ -3,32 +3,33 @@
 @section('content')
 <div id="page-wrapper">
     <div class="container-fluid">
-        <div class="row">
 
+        {{-- PAGE HEADER --}}
+        <div class="row">
             <div class="col-lg-12">
                 <h1 class="page-header">
                     User <small>Edit</small>
                 </h1>
             </div>
+        </div>
 
-            @if(count($errors))
-                <div class="col-lg-12">
-                    <div class="alert alert-danger">
-                        @foreach($errors->all() as $err)
-                            <p>{{ $err }}</p>
-                        @endforeach
-                    </div>
-                </div>
-            @endif
+        {{-- ERRORS --}}
+        @if($errors->any())
+            <div class="alert alert-danger">
+                @foreach($errors->all() as $err)
+                    <p>{{ $err }}</p>
+                @endforeach
+            </div>
+        @endif
 
-            @if(session('success'))
-                <div class="col-lg-12">
-                    <div class="alert alert-success">
-                        {{ session('success') }}
-                    </div>
-                </div>
-            @endif
+        {{-- SUCCESS --}}
+        @if(session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
 
+        <div class="row">
             <div class="col-lg-6">
                 <div class="panel panel-default">
                     <div class="panel-heading">
@@ -44,7 +45,8 @@
                                 <label>Name</label>
                                 <input class="form-control"
                                        name="name"
-                                       value="{{ $user->name }}">
+                                       value="{{ old('name', $user->name) }}"
+                                       required>
                             </div>
 
                             <div class="form-group">
@@ -76,14 +78,14 @@
                                     <input type="radio"
                                            name="is_admin"
                                            value="0"
-                                           {{ !$user->is_admin ? 'checked' : '' }}>
+                                           {{ old('is_admin', $user->is_admin) == 0 ? 'checked' : '' }}>
                                     User
                                 </label>
                                 <label class="radio-inline" style="margin-left:15px;">
                                     <input type="radio"
                                            name="is_admin"
                                            value="1"
-                                           {{ $user->is_admin ? 'checked' : '' }}>
+                                           {{ old('is_admin', $user->is_admin) == 1 ? 'checked' : '' }}>
                                     Admin
                                 </label>
                             </div>
@@ -99,8 +101,8 @@
                     </div>
                 </div>
             </div>
-
         </div>
+
     </div>
 </div>
 @endsection
