@@ -82,7 +82,10 @@
 
                 {{-- Pagination --}}
                 <div class="text-right">
-                    {{ $contacts->links() }}
+                    <div class="text-right">
+    {{ $contacts->links('pagination::bootstrap-4') }}
+</div>
+
                 </div>
             </div>
         </div>
