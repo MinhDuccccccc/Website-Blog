@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use App\Jobs\StoreContactJob;
 
 class WebController extends Controller
 {
@@ -158,23 +159,23 @@ class WebController extends Controller
         return view('web.contact');
     }
 
-    public function sendContact(Request $request)
-    {
-        $validated = $request->validate([
-            'name'    => 'required|string|max:255',
-            'address' => 'required|email|max:255',
-            'phone'   => 'required|string|max:20',
-            'subject' => 'required|string|max:255',
-            'message' => 'required|string|max:1000',
-        ]);
+public function sendContact(Request $request)
+{
+    $validated = $request->validate([
+        'name'    => 'required|string|max:255',
+        'address' => 'required|email|max:255',
+        'phone'   => 'required|string|max:20',
+        'subject' => 'required|string|max:255',
+        'message' => 'required|string|max:1000',
+    ]);
 
-        Contact::create($validated);
+    // ĐẨY VÀO QUEUE
+    StoreContactJob::dispatch($validated);
 
-        return redirect()
-            ->route('web.contact')
-            ->with('success', 'Created contact successfully');
-    }
-
+    return redirect()
+        ->route('web.contact')
+        ->with('success', 'Created contact successfully');
+}
     public function search(Request $request)
     {
         $keyword = $request->get('keyword');
